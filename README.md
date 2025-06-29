@@ -1,3 +1,18 @@
+# opticfluorine/cimgui
+
+This is a fork of cimgui that provides an opinionated all-in-one build with all dependencies included. The specific build configuration includes:
+
+* Builds cimgui as a shared library (.dll/.so)
+* All dependencies statically linked into the shared library to give a single file drop-in solution
+* Includes freetype v2.13.3 for improved TTF rendering
+* Incldues plutosvg v0.0.7 for handling SVG glyphs in TTF fonts
+* Enables 32-bit wide character support (wchar32) to provide access to emojis and other higher code points
+
+The goal of this fork is to provide a single cimgui shared library that can be dropped into other dynamically linked Dear ImGui wrappers to provide all of the above. Note that to use this build, the wrapepr will need to support the following:
+
+* Must include wrappers for Dear ImGui's freetype support
+* Must include wchar32 support
+
 # cimgui [![Build Status](https://travis-ci.org/cimgui/cimgui.svg?branch=master)](https://travis-ci.org/cimgui/cimgui)
 
 

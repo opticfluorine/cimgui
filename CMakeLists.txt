@@ -21,32 +21,21 @@ file(GLOB IMGUI_SOURCES
 	${TABLES_SOURCE}
 )
 
-set(IMGUI_STATIC "no" CACHE STRING "Build as a static library")
-set(IMGUI_FREETYPE "no" CACHE STRING "Build with freetype library")
 set(IMGUI_LIBRARIES )
 
-if(IMGUI_FREETYPE)
-	message(STATUS "Building with freetype")
-	FIND_PACKAGE(freetype REQUIRED PATHS ${FREETYPE_PATH})
-	list(APPEND IMGUI_LIBRARIES freetype)
-	list(APPEND IMGUI_SOURCES imgui/misc/freetype/imgui_freetype.cpp)
-endif(IMGUI_FREETYPE)
+FIND_PACKAGE(freetype CONFIG REQUIRED)
+FIND_PACKAGE(plutovg CONFIG REQUIRED)
+FIND_PACKAGE(plutosvg CONFIG REQUIRED)
 
-#add library and link
-if (IMGUI_STATIC)
-    add_library(cimgui STATIC ${IMGUI_SOURCES})
-else (IMGUI_STATIC)
-    add_library(cimgui SHARED ${IMGUI_SOURCES})
-endif (IMGUI_STATIC)
+list(APPEND IMGUI_LIBRARIES Freetype::Freetype plutosvg::plutosvg plutovg::plutovg)
+list(APPEND IMGUI_SOURCES imgui/misc/freetype/imgui_freetype.cpp)
 
-if(IMGUI_FREETYPE)
-	target_compile_definitions(cimgui PUBLIC IMGUI_ENABLE_FREETYPE)
-	target_compile_definitions(cimgui PUBLIC IMGUI_ENABLE_STB_TRUETYPE)
-endif(IMGUI_FREETYPE)
+add_library(cimgui SHARED ${IMGUI_SOURCES})
 
-if(IMGUI_WCHAR32)
-	target_compile_definitions(cimgui PUBLIC IMGUI_USE_WCHAR32)
-endif(IMGUI_WCHAR32)
+target_compile_definitions(cimgui PUBLIC IMGUI_ENABLE_FREETYPE)
+target_compile_definitions(cimgui PUBLIC IMGUI_ENABLE_FREETYPE_PLUTOSVG)
+target_compile_definitions(cimgui PUBLIC IMGUI_ENABLE_STB_TRUETYPE)
+target_compile_definitions(cimgui PUBLIC IMGUI_USE_WCHAR32)
 
 add_definitions("-DIMGUI_USER_CONFIG=\"../cimconfig.h\"")
 target_compile_definitions(cimgui PUBLIC IMGUI_DISABLE_OBSOLETE_FUNCTIONS=1)
