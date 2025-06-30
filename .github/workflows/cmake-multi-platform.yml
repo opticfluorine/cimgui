@@ -27,10 +27,6 @@ jobs:
       with:
         submodules: true
 
-    - name: Set up Windows build tools
-      uses: microsoft/setup-msbuild@v2
-      if: runner.os == 'Windows'
-
     - name: Set up CMake and Ninja
       uses: lukka/get-cmake@6b3e96a9bc9976b8b546346fdd102effedae0ca8
 
@@ -48,8 +44,6 @@ jobs:
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
         --preset default
         -DCMAKE_BUILD_TYPE=Release
-        -DCMAKE_C_COMPILER=${{ runner.os == 'Windows' && 'cl' || 'gcc' }}
-        -DCMAKE_CXX_COMPILER=${{ runner.os == 'Windows' && 'cl' || 'g++' }}
         -S ${{ github.workspace }}
 
     - name: Build
