@@ -48,6 +48,8 @@ jobs:
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
         --preset default
         -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_C_COMPILER=${{ runner.os == 'Windows' && 'cl' || 'gcc' }}
+        -DCMAKE_CXX_COMPILER=${{ runner.os == 'Windows' && 'cl' || 'g++' }}
         -S ${{ github.workspace }}
 
     - name: Build
