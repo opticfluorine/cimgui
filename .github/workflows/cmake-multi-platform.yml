@@ -2,7 +2,10 @@
 # See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
 name: Build cross-platform binaries
 
-on: workflow_dispatch
+on:
+  push:
+    branches:
+      - cicd-build
 
 jobs:
   build:
@@ -55,3 +58,40 @@ jobs:
       with:
         name: cimgui-${{ runner.os }}-${{ runner.arch }}
         path: ${{ steps.strings.outputs.build-output-dir }}/*${{ runner.os == 'Windows' && '.dll' || '.so' }}
+
+  open-pr:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Checkout Sovereign Engine code
+      uses: actions/checkout@v4
+      with:
+        repository: opticfluorine/sovereign
+        ref: main
+        path: sovereign
+        token: ${{ secrets.SOVEREIGN_GITHUB_PAT }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: cimgui-artifacts
+
+    - name: Unpack and place artifacts, commit changes
+      run: |
+        pushd $GITHUB_WORKSPACE/sovereign/src/Client/SovereignClient
+        mkdir -p runtimes/linux-x64/native
+        mkdir -p runtimes/win-x64/native
+        cp -r $GITHUB_WORKSPACE/cimgui-artifacts/cimgui-Linux-X64/* runtimes/linux-x64/native/
+        cp -r $GITHUB_WORKSPACE/cimgui-artifacts/cimgui-Windows-X64/* runtimes/win-x64/native/
+        popd
+
+    - name: Create pull request
+      uses: peter-evans/create-pull-request@a59c52d55daab9f6a666e8741848b3cf101395a7
+      with:
+        token: ${{ secrets.SOVEREIGN_GITHUB_PAT }}
+        path: sovereign
+        commit-message: "Update cimgui binaries"
+        title: "Update cimgui binaries"
+        body: "Automated update of cimgui binaries from CI build."
+        branch: update-cimgui-${{ github.run_id }}-${{ github.run_attempt }}
