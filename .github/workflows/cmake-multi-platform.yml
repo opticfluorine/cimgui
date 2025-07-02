@@ -47,6 +47,7 @@ jobs:
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
         --preset default
         -DCMAKE_BUILD_TYPE=Release
+        -DVCPKG_TARGET_TRIPLET=${{ matrix.os == 'windows-latest' && 'x64-windows' || 'x64-linux' }}-static
         -S ${{ github.workspace }}
 
     - name: Build
